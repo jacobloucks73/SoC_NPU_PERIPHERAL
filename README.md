@@ -8,32 +8,97 @@ The NPU ships with a fully tested reference implementation on the **Lattice ECP5
 
 ---
 
+## System Architecture
+
+```mermaid
+block-beta
+  columns 5
+
+  block:FPGA:5
+    columns 5
+    A["NEORV32 RISC-V CPU (or any Wishbone master)"]:5
+    space:5
+    B["Wishbone B4 Bus"]:5
+    space:5
+    block:NPU:2
+      columns 1
+      C["NPU Peripheral"]
+      D["Dense / MAC"]
+      E["Activation (ReLU)"]
+      F["Pooling"]
+    end
+    space
+    block:IO:2
+      columns 1
+      G["OV5640 Camera"]
+      H["UART / GPIO"]
+    end
+  end
+
+  A --> B
+  B --> C
+  B --> G
+  B --> H
+
+  style FPGA fill:transparent,stroke:#888
+  style NPU fill:transparent,stroke:#D85A30
+  style IO fill:transparent,stroke:#1D9E75
+```
+
+> **The NPU peripheral (`RTL/wb_peripheral.vhd`) is the reusable core.** Swap out the CPU, swap out the FPGA — the NPU just needs a Wishbone bus.
+
+---
+
+## Train → Deploy Workflow
+
+```mermaid
+flowchart LR
+    A["🐍 Train model\n(Python)"] --> B["⚙️ Export weights\n(convert_weightsv4.py)"]
+    B --> C["📦 Embed in firmware\n(Ada constants)"]
+    C --> D["🔨 Build & flash\n(Alire + image_gen)"]
+    D --> E["🚀 Run inference\n(NEORV32 + NPU)"]
+
+    style A fill:#EEEDFE,stroke:#534AB7,color:#3C3489
+    style B fill:#FAEEDA,stroke:#854F0B,color:#633806
+    style C fill:#E1F5EE,stroke:#0F6E56,color:#085041
+    style D fill:#E6F1FB,stroke:#185FA5,color:#0C447C
+    style E fill:#FAECE7,stroke:#993C1D,color:#712B13
+```
+
+1. **Train** a model on your PC using Python (see [`ML_MODELS/`](ML_MODELS/)).
+2. **Export** the weights to fixed-point using [`HELPER_SCRIPTS/convert_weightsv4.py`](HELPER_SCRIPTS/convert_weightsv4.py).
+3. **Embed** the exported weight arrays as Ada constants in your firmware project.
+4. **Build** the firmware with Alire and generate a NEORV32 executable.
+5. **Run** inference on the FPGA — firmware sends data to the NPU over Wishbone and reads back results.
+
+---
+
 ## Repository Structure
 
-```
-SoC_NPU_PERIPHERAL/
-│
-├── RTL/                        # The reusable NPU peripheral (VHDL)
-│   └── wb_peripheral.vhd      #   Wishbone-slave NPU core
-│
-├── ML_MODELS/                  # Python model training & weight export
-│   ├── 14x14_mnist_test.py    #   MNIST 14×14 model
-│   ├── 28x28_mnist_test.ipynb #   MNIST 28×28 notebook
-│   ├── breast_cancer.ipynb    #   Breast cancer classification
-│   └── rock_paper_scissor_manual_dataset_and_model.ipynb
-│
-├── HELPER_SCRIPTS/             # Utilities for weight conversion & data prep
-│   ├── convert_weightsv4.py   #   Trained weights → fixed-point for FPGA
-│   └── convert_data_to_img.py #   Inference data → image visualization
-│
-└── SUPPORTED_FPGAS/            # Board-specific integration
-    ├── ECP5U5MG/               #   Lattice ECP5 (primary, fully tested)
-    │   └── NEORV32/
-    │       ├── FIRMWARE/       #     Ada (and C) firmware for the NEORV32
-    │       ├── NEORV32_SPECIFIC/ #   Top-level VHDL, constraints, TCL scripts
-    │       ├── PREBUILT_DEMOS/ #     Ready-to-flash bitstreams & binaries
-    │       └── SUPPORTED_CAMERAS/ #  OV5640 camera peripheral (RTL + Ada driver)
-    └── BASYS/                  #   Xilinx Basys3 (planned / community)
+```mermaid
+graph TD
+    ROOT["SoC_NPU_PERIPHERAL"] --> RTL["RTL/\nNPU peripheral VHDL"]
+    ROOT --> ML["ML_MODELS/\nPython training"]
+    ROOT --> HS["HELPER_SCRIPTS/\nWeight conversion"]
+    ROOT --> SF["SUPPORTED_FPGAS/"]
+
+    SF --> ECP5["ECP5U5MG/NEORV32/"]
+    SF --> BASYS["BASYS/ (planned)"]
+
+    ECP5 --> FW["FIRMWARE/ADA/\nLibs + demo apps"]
+    ECP5 --> N32["NEORV32_SPECIFIC/\nTop-level, constraints, TCL"]
+    ECP5 --> PRE["PREBUILT_DEMOS/\nReady-to-flash"]
+    ECP5 --> CAM["SUPPORTED_CAMERAS/\nOV5640"]
+
+    style RTL fill:#FAECE7,stroke:#993C1D,color:#712B13
+    style ML fill:#EEEDFE,stroke:#534AB7,color:#3C3489
+    style HS fill:#FAEEDA,stroke:#854F0B,color:#633806
+    style ECP5 fill:#E1F5EE,stroke:#0F6E56,color:#085041
+    style BASYS fill:#F1EFE8,stroke:#5F5E5A,color:#444441
+    style FW fill:#E6F1FB,stroke:#185FA5,color:#0C447C
+    style N32 fill:#E6F1FB,stroke:#185FA5,color:#0C447C
+    style PRE fill:#E6F1FB,stroke:#185FA5,color:#0C447C
+    style CAM fill:#E6F1FB,stroke:#185FA5,color:#0C447C
 ```
 
 ---
@@ -103,38 +168,7 @@ cd SUPPORTED_FPGAS/ECP5U5MG/NEORV32/NEORV32_SPECIFIC
 pnmainc create_neorv32_diamond.tcl
 ```
 
-See [`SUPPORTED_FPGAS/ECP5U5MG/NEORV32/NEORV32_SPECIFIC/README.md`](SUPPORTED_FPGAS/ECP5U5MG/NEORV32/NEORV32_SPECIFIC/README.md) for full details.
-
----
-
-## How It Works
-
-```
-┌────────────────────────────────────────────────────────────┐
-│                     NEORV32 RISC-V CPU                     │
-│                   (or any Wishbone master)                  │
-└─────────────────────────┬──────────────────────────────────┘
-                          │  Wishbone B4 Bus
-                          │
-                ┌─────────┴──────────┐
-                │   wb_peripheral    │  ← NPU Peripheral (RTL/)
-                │  ┌──────────────┐  │
-                │  │  Dense/MAC   │  │     Multiply-accumulate for
-                │  │              │  │     fully connected layers
-                │  ├──────────────┤  │
-                │  │  Activation  │  │     ReLU, sigmoid, etc.
-                │  │              │  │
-                │  ├──────────────┤  │
-                │  │   Pooling    │  │     Max / average pooling
-                │  └──────────────┘  │
-                └────────────────────┘
-```
-
-**The workflow:**
-1. **Train** a model on your PC using Python (see `ML_MODELS/`).
-2. **Export** the weights to fixed-point format using `HELPER_SCRIPTS/convert_weightsv4.py`.
-3. **Embed** the weights as Ada constants in your firmware project.
-4. **Run** inference on the FPGA — the firmware sends data to the NPU peripheral over Wishbone and reads back results.
+See [`NEORV32_SPECIFIC/README.md`](SUPPORTED_FPGAS/ECP5U5MG/NEORV32/NEORV32_SPECIFIC/README.md) for full details.
 
 ---
 
@@ -161,7 +195,7 @@ You do **not** need the NEORV32 or the ECP5. Any Wishbone master will work. See 
 | **Rock-Paper-Scissors** | Image→dense→3 | Grayscale image classification |
 | **Integration Test** | Multi-model | Runs multiple models to verify all NPU operations |
 
-Each demo includes the Python training code (`ML_MODELS/`), the Ada firmware (`SUPPORTED_FPGAS/.../ADA_DEMO_FIRMWARE/`), and prebuilt binaries (`PREBUILT_DEMOS/`).
+Each demo includes the Python training code ([`ML_MODELS/`](ML_MODELS/)), the Ada firmware ([`SUPPORTED_FPGAS/.../ADA_DEMO_FIRMWARE/`](SUPPORTED_FPGAS/ECP5U5MG/NEORV32/FIRMWARE/ADA/ADA_DEMO_FIRMWARE/)), and prebuilt binaries ([`PREBUILT_DEMOS/`](SUPPORTED_FPGAS/ECP5U5MG/NEORV32/PREBUILT_DEMOS/)).
 
 ---
 
