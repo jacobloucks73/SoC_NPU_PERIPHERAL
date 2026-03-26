@@ -1,0 +1,119 @@
+V "GNAT Lib v14"
+A -Og
+A -gnatA
+A --RTS=/home/dipen/.local/share/alire/builds/bare_runtime_14.0.0_095db6f0/282b01b920f0d5bb2bac604ac6d9e811f26d175144bc99af963e0381e797ee94/
+A -mabi=ilp32
+A -ffunction-sections
+A -fdata-sections
+A -g
+A -gnatwa
+A -gnatw.X
+A -gnatVa
+A -gnaty3
+A -gnatya
+A -gnatyA
+A -gnatyB
+A -gnatyb
+A -gnatyc
+A -gnaty-
+A -gnatyd
+A -gnatye
+A -gnatyf
+A -gnatyh
+A -gnatyi
+A -gnatyI
+A -gnatyk
+A -gnatyl
+A -gnatym
+A -gnatyn
+A -gnatyO
+A -gnatyp
+A -gnatyr
+A -gnatyS
+A -gnatyt
+A -gnatyu
+A -gnatyx
+A -gnatW8
+A -gnat2022
+A -misa-spec=20191213
+A -march=rv32i_zicsr_zifencei
+P ZX
+
+RN
+RV NO_ENUMERATION_MAPS
+RV NO_IO
+RV NO_DYNAMIC_SIZED_OBJECTS
+RV NO_IMPLEMENTATION_PRAGMAS
+
+U wb_ov5640_helper.debug%b  wb_ov5640_helper-debug.adb  9bfd413b NE OO PK
+W ada%s			ada.ads			ada.ali
+W ada.text_io%s		a-textio.adb		a-textio.ali
+W interfaces%s		interfac.ads		interfac.ali
+Z system.img_int%s	s-imgint.ads		s-imgint.ali
+Z system.img_uns%s	s-imguns.ads		s-imguns.ali
+Z system.unsigned_types%s  s-unstyp.ads		s-unstyp.ali
+W wb_ov5640_helper%s	wb_ov5640_helper.adb	wb_ov5640_helper.ali
+
+U wb_ov5640_helper.debug%s  wb_ov5640_helper-debug.ads  955fd53e EE NE OO PK
+W wb_ov5640_helper%s	wb_ov5640_helper.adb	wb_ov5640_helper.ali
+
+D ada.ads		20250921045803 76789da1 ada%s
+D a-textio.ads		20250921045803 6c013a58 ada.text_io%s
+D input_output_helper.ads  20260203082423 5e586928 input_output_helper%s
+D interfac.ads		20250921045803 9111f9c1 interfaces%s
+D system.ads		20250921045803 28e4acdd system%s
+D s-atacco.ads		20250921045803 5868e3ba system.address_to_access_conversions%s
+D s-imagei.ads		20250921045803 5e131ce0 system.image_i%s
+D s-imageu.ads		20250921045803 b0b50650 system.image_u%s
+D s-imgint.ads		20250921045803 67e4edfb system.img_int%s
+D s-imguns.ads		20250921045803 c4e23690 system.img_uns%s
+D s-stoele.ads		20250921045803 ccded4e8 system.storage_elements%s
+D s-unstyp.ads		20250921045803 fa2a7f59 system.unsigned_types%s
+D s-valspe.ads		20250921045803 b0fcd073 system.val_spec%s
+D s-vaispe.ads		20250921045803 8280550e system.value_i_spec%s
+D s-vaispe.adb		20250921045803 dbcabb05 system.value_i_spec%b
+D s-vauspe.ads		20250921045803 89269ba5 system.value_u_spec%s
+D s-vauspe.adb		20250921045803 8524adb4 system.value_u_spec%b
+D s-vs_int.ads		20250921045803 06b6b724 system.vs_int%s
+D s-vs_uns.ads		20250921045803 e7f47a27 system.vs_uns%s
+D wb_ov5640_helper.ads	20260206055037 1e6a3103 wb_ov5640_helper%s
+D wb_ov5640_helper-debug.ads  20260205171803 8b35e43d wb_ov5640_helper.debug%s
+D wb_ov5640_helper-debug.adb  20260205180009 edd8669f wb_ov5640_helper.debug%b
+G a e
+G c Z s b [print_registers wb_ov5640_helper__debug 3 14 none]
+G c Z s b [print_status_register_detail wb_ov5640_helper__debug 4 14 none]
+G r c none [print_registers wb_ov5640_helper__debug 3 14 none] [read_reg input_output_helper 48 13 none]
+G r c none [print_status_register_detail wb_ov5640_helper__debug 4 14 none] [read_reg input_output_helper 48 13 none]
+X 1 ada.ads
+16K9*Ada 20e8 22|1r6 1r23
+X 2 a-textio.ads
+36K13*Text_IO 62e16 22|1w10 1r27
+54U14*Put_Line 22|7s7 8s7 9s7 12s7 34s7 35s7 36s7 37s7 38s7 39s7 40s7 41s7
+X 3 input_output_helper.ads
+13M11*Word{4|81M9} 22|7r32 8r34 11r12 14r12 18r23 28r21 29r23 30r28 31r28
+. 32r31 34r34 35r34
+48V13*Read_Reg{13M11} 22|7s44 8s46 11s24 14s24 26s12 34s46
+X 4 interfac.ads
+38K9*Interfaces 233e15 22|2w6 2r22
+81M9*Unsigned_32 22|27r35
+146V13*Shift_Right{81M9} 22|27s22
+X 5 system.ads
+85M9*Address
+X 20 wb_ov5640_helper.ads
+5K9*Wb_Ov5640_Helper 54e21 21|1r9 6r5 22|3r14 44r5
+9m4*CTRL_Addr{5|85M9} 22|7r54 34r56
+12m4*STATUS_Addr{5|85M9} 22|8r56 26r22
+17m4*IMAGE_RESOLUTION_Addr{5|85M9} 22|11r34 14r34
+X 21 wb_ov5640_helper-debug.ads
+1K26*Debug 20|5k9 21|6l22 6e27 22|3b31 44l22 44t27
+3U14*Print_Registers 22|5b14 15l8 15t23
+4U14*Print_Status_Register_Detail 22|17b14 42l8 42t36
+X 22 wb_ov5640_helper-debug.adb
+18m7 S{3|13M11} 26m7 27r48 28r15 29r17 30r22 31r22 32r25 35r46
+19i7 St{natural} 27m7 36r48
+20b7 Saw{boolean} 28m7 37r58
+21b7 Saw_V{boolean} 29m7 38r53
+22b7 Saw_V_Edge{boolean} 30m7 39r53
+23b7 Saw_H_Edge{boolean} 31m7 40r52
+24b7 Saw_PCLK_Edge{boolean} 32m7 41r52
+
