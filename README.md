@@ -205,13 +205,6 @@ We welcome contributions — especially ports to new FPGA boards. See [`CONTRIBU
 
 ---
 
-## License
-
-<!-- TODO: Add a LICENSE file. MIT or BSD-3-Clause recommended for open FPGA IP. -->
-
-*License TBD — please add a LICENSE file.*
-
----
 
 ## Acknowledgments
 
